@@ -110,7 +110,7 @@ const EmployeesScreen = ({navigation}:any) => {
             <FlatList
                 onEndReached={() => console.log("End Reached")}
                 data={DATA}
-                renderItem={({ item }) => <Pressable _pressed={{
+                renderItem={({ item }) => <Pressable onPress={()=>navigation.navigate("EmployeeSingle")} _pressed={{
                     bg: "muted.100"
                 }} bg='white' borderBottomWidth="1" _dark={{
                     borderColor: "muted.50"
