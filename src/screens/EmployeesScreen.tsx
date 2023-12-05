@@ -103,7 +103,7 @@ const DATA = [
         title: 'Third Item',
     },
 ];
-const EmployeesScreen = () => {
+const EmployeesScreen = ({navigation}:any) => {
 
     return (
         <SafeAreaView>
@@ -140,7 +140,7 @@ const EmployeesScreen = () => {
                 </Pressable>}
                 keyExtractor={(item, index) => index.toString()}
             />
-            <Fab renderInPortal={false} shadow={2} colorScheme="indigo" icon={<FontAwesomeIcon color='white' icon={faAdd} />} />
+            <Fab renderInPortal={false} shadow={2} onPress={()=>navigation.navigate("EmployeeCreate")} colorScheme="indigo" icon={<FontAwesomeIcon color='white' icon={faAdd} />} />
         </SafeAreaView>
     );
 };
