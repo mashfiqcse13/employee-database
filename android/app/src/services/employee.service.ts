@@ -1,3 +1,4 @@
+import { apiEndPoints } from "../config";
 import Employee, { ApiEmployeeListResponse } from "../types/employee.type";
 
 const endPoint = apiEndPoints.employees
@@ -65,7 +66,7 @@ function update(employee: Employee, token: string) {
         redirect: 'follow'
     } as RequestInit;
 
-    return fetch(endPoint + employee.id + "/", requestOptions)
+    return fetch(endPoint + "/" + employee.id, requestOptions)
         .then(response => response.json())
         .then(response => response as Employee)
 
@@ -81,7 +82,7 @@ function view(id: Employee, token: string) {
         redirect: 'follow'
     } as RequestInit;
 
-    return fetch(endPoint + id + "/", requestOptions)
+    return fetch(endPoint + "/" + id, requestOptions)
         .then(response => response.json())
         .then(response => response as Employee)
 }

@@ -1,4 +1,3 @@
-import { StackActions } from '@react-navigation/native';
 import { Box, Button, Center, FormControl, HStack, Input, ScrollView, VStack } from 'native-base';
 import React, { useState } from 'react';
 import DatePicker from 'react-native-date-picker';

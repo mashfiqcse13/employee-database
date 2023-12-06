@@ -1,9 +1,47 @@
 import { StackActions } from '@react-navigation/native';
-import { Box, Button, Center, FormControl, HStack, Heading, Input, VStack } from 'native-base';
-import React from 'react';
+import { Box, Button, Center, FormControl, HStack, Heading, Input, Spinner, VStack, useToast } from 'native-base';
+import React, { useRef, useState } from 'react';
+import AS from '../../android/app/src/services/auth.service';
 
 const LoginScreen = ({ navigation }: any) => {
-
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
+    const [loading, setLoading] = useState(false)
+    const toast = useToast();
+    function showError(errMsg: string) {
+        toast.show({
+            render: () => {
+                return <Box bg="danger.300" px="2" py="1" rounded="sm" mb={5}>{errMsg}</Box>;
+            }
+        });
+        return null
+    }
+    function showSuccess(msg: string) {
+        toast.show({
+            render: () => {
+                return <Box bg="success.300" px="2" py="1" rounded="sm" mb={5}>{msg}</Box>;
+            }
+        });
+        return null
+    }
+    function login() {
+        if (!email) {
+            return showError("Email Required")
+        }
+        if (!password) {
+            return showError("Password Required")
+        }
+        setLoading(true)
+        AS.login(email, password).then((response) => {
+            showSuccess(response.message)
+            console.log(JSON.stringify(response,null,2))
+            navigation.dispatch(
+                StackActions.replace('Employees')
+            )
+        }).catch((error) => {
+            showError(error.message)
+        }).finally(() => setLoading(false))
+    }
     return (
         <VStack justifyContent='center' height='100%'>
             <Center w="100%">
@@ -22,16 +60,14 @@ const LoginScreen = ({ navigation }: any) => {
                     <VStack space={3} mt="5">
                         <FormControl>
                             <FormControl.Label>Email ID</FormControl.Label>
-                            <Input />
+                            <Input value={email} onChangeText={(value: string) => setEmail(value)} />
                         </FormControl>
                         <FormControl>
                             <FormControl.Label>Password</FormControl.Label>
-                            <Input type="password" />
+                            <Input type="password" value={password} onChangeText={(value: string) => setPassword(value)} />
                         </FormControl>
-                        <Button mt="2" colorScheme="indigo" onPress={() => navigation.dispatch(
-                            StackActions.replace('Employees')
-                        )}>
-                            Sign in
+                        <Button disabled={loading} mt="2" colorScheme="indigo" onPress={login}>
+                            {loading ? <Spinner color="white" accessibilityLabel="Verifing Credntials" /> : "Sign in"}
                         </Button>
                         <HStack mt="6" justifyContent="center">
                         </HStack>
