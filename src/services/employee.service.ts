@@ -2,7 +2,10 @@ import { apiEndPoints } from "../config";
 import Employee, { ApiEmployeeListResponse } from "../types/employee.type";
 
 const endPoint = apiEndPoints.employees
-function list(token: string) {
+export function list(token: string, page = 1) {
+    if(token){
+        console.log("Token Missing")
+    }
     var myHeaders = new Headers();
     myHeaders.append("Accept", "application/json");
     myHeaders.append("Authorization", "Bearer " + token);
@@ -12,13 +15,20 @@ function list(token: string) {
         headers: myHeaders,
         redirect: 'follow'
     } as RequestInit;
+    const url = endPoint + (page > 1 ? `?page=${page}` : "")
 
-    return fetch(endPoint, requestOptions)
-        .then(response => response.json())
+    return fetch(url, requestOptions)
+        .then(response => {
+            if (response.status === 200) {
+                return response.json()
+            } else {
+                return response.json().then(error => { throw new Error(error.message) })
+            }
+        })
         .then(response => response as ApiEmployeeListResponse)
 
 }
-function create(employee: Employee, token: string) {
+export function create(employee: Employee, token: string) {
     var myHeaders = new Headers();
     myHeaders.append("Accept", "application/json");
     myHeaders.append("Authorization", "Bearer " + token);
@@ -44,7 +54,7 @@ function create(employee: Employee, token: string) {
         .then(response => response.json())
         .then(response => response as Employee)
 }
-function update(employee: Employee, token: string) {
+export function update(employee: Employee, token: string) {
     var myHeaders = new Headers();
     myHeaders.append("Accept", "application/json");
     myHeaders.append("Authorization", "Bearer " + token);
@@ -71,7 +81,7 @@ function update(employee: Employee, token: string) {
         .then(response => response as Employee)
 
 }
-function view(id: Employee, token: string) {
+export function view(id: Employee, token: string) {
     var myHeaders = new Headers();
     myHeaders.append("Accept", "application/json");
     myHeaders.append("Authorization", "Bearer " + token);
@@ -83,9 +93,12 @@ function view(id: Employee, token: string) {
     } as RequestInit;
 
     return fetch(endPoint + "/" + id, requestOptions)
-        .then(response => response.json())
+        .then(response => {
+            if (response.status === 200) {
+                return response.json()
+            } else {
+                return response.json().then(error => { throw new Error(error.message) })
+            }
+        })
         .then(response => response as Employee)
 }
-
-const ES = { list, create, update, view }
-export default ES

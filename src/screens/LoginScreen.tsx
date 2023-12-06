@@ -4,7 +4,7 @@ import React, { useRef, useState } from 'react';
 import AS from '../services/auth.service';
 import { useDispatch, useSelector } from 'react-redux';
 import User from '../types/user.type';
-import { save } from '../userReducer';
+import { setName, setToken } from '../userReducer';
 import { adminAccess } from '../config';
 
 const LoginScreen = ({ navigation }: any) => {
@@ -41,7 +41,8 @@ const LoginScreen = ({ navigation }: any) => {
         AS.login(email, password).then((response) => {
             showSuccess(response.message)
             // console.log(JSON.stringify(response,null,2))
-            dispatch(save(response.currentUser))
+            dispatch(setName(response.currentUser.name))
+            dispatch(setToken(response.currentUser.token))
             navigation.dispatch(
                 StackActions.replace('Employees')
             )
