@@ -3,6 +3,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { Box, Fab, HStack, Pressable, Spacer, Text, VStack } from 'native-base';
 import React from 'react';
 import { FlatList, SafeAreaView } from 'react-native';
+import { useSelector } from 'react-redux';
+import User from '../types/user.type';
 
 
 const DATA = [
@@ -104,9 +106,11 @@ const DATA = [
     },
 ];
 const EmployeesScreen = ({navigation}:any) => {
+    const user = useSelector((state:any) => state)
 
     return (
         <SafeAreaView>
+            <Text>FUll Name : {JSON.stringify(user)}</Text>
             <FlatList
                 onEndReached={() => console.log("End Reached")}
                 data={DATA}

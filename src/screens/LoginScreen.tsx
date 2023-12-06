@@ -1,13 +1,19 @@
 import { StackActions } from '@react-navigation/native';
 import { Box, Button, Center, FormControl, HStack, Heading, Input, Spinner, VStack, useToast } from 'native-base';
 import React, { useRef, useState } from 'react';
-import AS from '../../android/app/src/services/auth.service';
+import AS from '../services/auth.service';
+import { useDispatch, useSelector } from 'react-redux';
+import User from '../types/user.type';
+import { save } from '../userReducer';
+import { adminAccess } from '../config';
 
 const LoginScreen = ({ navigation }: any) => {
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
+    const [email, setEmail] = useState(adminAccess.email)
+    const [password, setPassword] = useState(adminAccess.password)
     const [loading, setLoading] = useState(false)
     const toast = useToast();
+    const user = useSelector((state:{user:User}) => state.user)
+    const dispatch = useDispatch()
     function showError(errMsg: string) {
         toast.show({
             render: () => {
@@ -34,7 +40,8 @@ const LoginScreen = ({ navigation }: any) => {
         setLoading(true)
         AS.login(email, password).then((response) => {
             showSuccess(response.message)
-            console.log(JSON.stringify(response,null,2))
+            // console.log(JSON.stringify(response,null,2))
+            dispatch(save(response.currentUser))
             navigation.dispatch(
                 StackActions.replace('Employees')
             )
