@@ -6,7 +6,7 @@ export const userSlice = createSlice({
     initialState: {} as User,
     reducers: {
         save: (state, action: PayloadAction<User>) => {
-            state.token = action.payload.token
+            state.name = action.payload.name
         },
     },
 })

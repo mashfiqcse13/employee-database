@@ -110,7 +110,6 @@ const EmployeesScreen = ({navigation}:any) => {
 
     return (
         <SafeAreaView>
-            <Text>FUll Name : {JSON.stringify(user)}</Text>
             <FlatList
                 onEndReached={() => console.log("End Reached")}
                 data={DATA}
