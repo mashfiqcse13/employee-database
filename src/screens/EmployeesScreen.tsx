@@ -111,7 +111,8 @@ const EmployeesScreen = ({ navigation }: any) => {
             <Fab
                 renderInPortal={false}
                 shadow={2} onPress={() => {
-                    navigation.navigate("EmployeeCreate")
+                    dispatch(setEmployee({} as Employee))
+                    navigation.navigate("EmployeeSingle")
                 }}
                 colorScheme="indigo"
                 icon={<FontAwesomeIcon color='white' icon={faAdd} />} />

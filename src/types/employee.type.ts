@@ -10,6 +10,10 @@ type Employee = {
     experience_in_years: number
     skill_level: "Beginner" | "Intermediate" | "Advanced"
 }
+export type EmployeeStore = {
+    loading:boolean
+    data: Employee
+}
 export type ApiEmployeeListResponse = {
     current_page:number
     data:Employee[]
