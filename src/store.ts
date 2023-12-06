@@ -1,8 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit'
-import userReducer from './userReducer'
+import userReducer from './reducers/userReducer'
+import employeeReducer from './reducers/employeeReducer'
 
 export default configureStore({
   reducer: {
-    user: userReducer
+    user: userReducer,
+    employee: employeeReducer
   },
 })

@@ -1,10 +1,9 @@
 import { StackActions } from '@react-navigation/native';
 import { Box, Button, Center, FormControl, HStack, Heading, Input, Spinner, VStack, useToast } from 'native-base';
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import AS from '../services/auth.service';
-import { useDispatch, useSelector } from 'react-redux';
-import User from '../types/user.type';
-import { setName, setToken } from '../userReducer';
+import { useDispatch } from 'react-redux';
+import { setName, setToken } from '../reducers/userReducer';
 import { adminAccess } from '../config';
 
 const LoginScreen = ({ navigation }: any) => {
@@ -12,7 +11,6 @@ const LoginScreen = ({ navigation }: any) => {
     const [password, setPassword] = useState(adminAccess.password)
     const [loading, setLoading] = useState(false)
     const toast = useToast();
-    const user = useSelector((state:{user:User}) => state.user)
     const dispatch = useDispatch()
     function showError(errMsg: string) {
         toast.show({

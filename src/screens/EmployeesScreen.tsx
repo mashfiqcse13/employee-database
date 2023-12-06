@@ -3,14 +3,16 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { Box, Fab, HStack, Pressable, Spacer, Spinner, Text, VStack, useToast } from 'native-base';
 import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, SafeAreaView } from 'react-native';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import User from '../types/user.type';
 import Employee from '../types/employee.type';
 import * as ES from '../services/employee.service';
+import { setEmployee } from '../reducers/employeeReducer';
 
 
 const EmployeesScreen = ({ navigation }: any) => {
     const token = useSelector((state: { user: User }) => state.user.token)
+    const dispatch = useDispatch()
     const [items, setItems] = useState<Employee[]>([])
     const currentPage = useRef(1)
     const lastPage = useRef(2)
@@ -72,7 +74,10 @@ const EmployeesScreen = ({ navigation }: any) => {
                 onRefresh={onRefresh}
                 onEndReached={() => loadData(currentPage.current + 1)}
                 data={items}
-                renderItem={({ item }) => <Pressable onPress={() => navigation.navigate("EmployeeSingle")} _pressed={{
+                renderItem={({ item }) => <Pressable onPress={() => {
+                    dispatch(setEmployee(item))
+                    navigation.navigate("EmployeeSingle")
+                }} _pressed={{
                     bg: "muted.100"
                 }} bg='white' borderBottomWidth="1" _dark={{
                     borderColor: "muted.50"
