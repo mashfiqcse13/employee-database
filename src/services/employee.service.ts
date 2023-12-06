@@ -3,9 +3,6 @@ import Employee, { ApiEmployeeListResponse } from "../types/employee.type";
 
 const endPoint = apiEndPoints.employees
 export function list(token: string, page = 1) {
-    if(token){
-        console.log("Token Missing")
-    }
     var myHeaders = new Headers();
     myHeaders.append("Accept", "application/json");
     myHeaders.append("Authorization", "Bearer " + token);

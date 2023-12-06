@@ -13,7 +13,7 @@ export const userSlice = createSlice({
         },
         setToken: (state, action) => {
             state.token = action.payload
-        },
+        }
     },
 })
 

@@ -1,11 +1,25 @@
-import { Box, Button, Center, CheckIcon, FormControl, HStack, Input, ScrollView, Select, VStack, useToast } from 'native-base';
+import { Box, Button, Center, CheckIcon, FormControl, HStack, Input, ScrollView, Select, Spinner, VStack, useToast } from 'native-base';
 import React, { useState } from 'react';
 import DatePicker from 'react-native-date-picker';
 import Employee from '../types/employee.type';
+import * as ES from '../services/employee.service';
+import User from '../types/user.type';
+import { useSelector } from 'react-redux';
 
 const EmployeeCreateScreen = ({ navigation }: any) => {
-    const [employee, setEmployee] = useState({} as Employee)
+    const [employee, setEmployee] = useState({
+        // "f_name": "Mashfiqur",
+        // "l_name": "Rahman",
+        // "dob": "2004-12-06",
+        // "phone": "01648758754",
+        // "gender": "Male",
+        // "skill_name": "Sales Executive",
+        // "experience_in_years": 10,
+        // "skill_level": "Beginner"
+    } as Employee)
     const [datePickerVisible, setDatePickerVisible] = useState(false)
+    const [loading, setLoading] = useState(false)
+    const token = useSelector((state: { user: User }) => state.user.token)
 
     const toast = useToast();
     function showError(errMsg: string) {
@@ -66,7 +80,20 @@ const EmployeeCreateScreen = ({ navigation }: any) => {
         if (!isValid()) {
             return null
         }
-        console.log('Creating employee', JSON.stringify(employee,null,2));
+        if (!token) {
+            console.log("Token Missing In onCreate")
+            return null
+        }
+        // console.log('Creating employee', JSON.stringify(employee, null, 2));
+        setLoading(true)
+        ES.create(employee, token).then((response) => {
+            if (response.id) {
+                showSuccess("New Employee Created. Swipe Down To Refresh This Page.")
+            }
+            navigation.goBack()
+        }).catch((error) => {
+            showError(error.message)
+        }).finally(() => setLoading(false))
     }
 
     return (
@@ -76,22 +103,30 @@ const EmployeeCreateScreen = ({ navigation }: any) => {
                 <Center w="100%">
                     <Box safeArea p="2" py="8" w="90%" maxW="290">
                         <VStack space={3} mt="5">
-                            <FormControl>
-                                <FormControl.Label>First Name</FormControl.Label>
-                                <Input value={employee.f_name} onChangeText={(f_name) => {
-                                    setEmployee({ ...employee, f_name })
-                                }} />
-                            </FormControl>
-                            <FormControl>
-                                <FormControl.Label>Last Name</FormControl.Label>
-                                <Input value={employee.l_name} onChangeText={(l_name) => {
-                                    setEmployee({ ...employee, l_name })
-                                }} />
-                            </FormControl>
+                            <HStack width="50%">
+                                <FormControl>
+                                    <FormControl.Label>First Name</FormControl.Label>
+                                    <Input
+                                        isDisabled={loading}
+                                        value={employee.f_name} onChangeText={(f_name) => {
+                                            setEmployee({ ...employee, f_name })
+                                        }} />
+                                </FormControl>
+                                <FormControl>
+                                    <FormControl.Label>Last Name</FormControl.Label>
+                                    <Input
+                                        isDisabled={loading}
+                                        value={employee.l_name} onChangeText={(l_name) => {
+                                            setEmployee({ ...employee, l_name })
+                                        }} />
+                                </FormControl>
+                            </HStack>
                             <FormControl>
                                 <FormControl.Label>Date Of Birth</FormControl.Label>
                                 <Input value={employee.dob} onFocus={() => {
-                                    setDatePickerVisible(true)
+                                    if (!loading) {
+                                        setDatePickerVisible(true)
+                                    }
                                 }} />
                                 {/* <Button onPress={() => {
                                     console.log("Opening")
@@ -113,9 +148,11 @@ const EmployeeCreateScreen = ({ navigation }: any) => {
                             </FormControl>
                             <FormControl>
                                 <FormControl.Label>Phone</FormControl.Label>
-                                <Input keyboardType='number-pad' value={employee.phone} onChangeText={(phone) => {
-                                    setEmployee({ ...employee, phone })
-                                }} />
+                                <Input
+                                    isDisabled={loading}
+                                    keyboardType='number-pad' value={employee.phone} onChangeText={(phone) => {
+                                        setEmployee({ ...employee, phone })
+                                    }} />
                             </FormControl>
                             <FormControl>
                                 <FormControl.Label>Gender</FormControl.Label>
@@ -131,13 +168,16 @@ const EmployeeCreateScreen = ({ navigation }: any) => {
                             </FormControl>
                             <FormControl>
                                 <FormControl.Label>Skill Name</FormControl.Label>
-                                <Input value={employee.skill_name} onChangeText={(skill_name) => {
-                                    setEmployee({ ...employee, skill_name })
-                                }} />
+                                <Input
+                                    isDisabled={loading}
+                                    value={employee.skill_name} onChangeText={(skill_name) => {
+                                        setEmployee({ ...employee, skill_name })
+                                    }} />
                             </FormControl>
                             <FormControl>
                                 <FormControl.Label>Experience in Years</FormControl.Label>
                                 <Input
+                                    isDisabled={loading}
                                     keyboardType='number-pad'
                                     value={employee.experience_in_years ? employee.experience_in_years.toString() : ""}
                                     onChangeText={(experience_in_years) => {
@@ -146,7 +186,7 @@ const EmployeeCreateScreen = ({ navigation }: any) => {
                             </FormControl>
                             <FormControl>
                                 <FormControl.Label>Skill Level</FormControl.Label>
-                                <Select selectedValue={employee.skill_level} minWidth="200" accessibilityLabel="Choose Gender"
+                                <Select isDisabled={loading} selectedValue={employee.skill_level} minWidth="200" accessibilityLabel="Choose Gender"
                                     placeholder="Choose Gender" _selectedItem={{
                                         bg: "teal.600",
                                         endIcon: <CheckIcon size="5" />
@@ -158,10 +198,25 @@ const EmployeeCreateScreen = ({ navigation }: any) => {
                                     <Select.Item label="Advanced" value="Advanced" />
                                 </Select>
                             </FormControl>
-                            <Button mt="2" colorScheme="indigo" onPress={onCreate}>
-                                Create
+                            <Button disabled={loading} mt="2" colorScheme="indigo" onPress={onCreate}>
+                                {loading ? <Spinner color="white" accessibilityLabel="Creating Employee" /> : "Create Employee"}
                             </Button>
-                            <HStack mt="6" justifyContent="center">
+                            <HStack justifyContent='center'>
+                                <Button w="50%" disabled={loading} mt="2" colorScheme="info" onPress={() => setEmployee({
+                                    f_name: "Mashfiqur",
+                                    l_name: "Rahman",
+                                    dob: "2004-12-06",
+                                    phone: "01648758754",
+                                    gender: "Male",
+                                    skill_name: "Sales Executive",
+                                    experience_in_years: 10,
+                                    skill_level: "Beginner"
+                                } as Employee)}>
+                                    Load Data
+                                </Button>
+                                <Button w="50%" disabled={loading} mt="2" colorScheme="warning" onPress={() => setEmployee({} as Employee)}>
+                                    Reset
+                                </Button>
                             </HStack>
                         </VStack>
                     </Box>

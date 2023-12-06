@@ -1,6 +1,6 @@
 import { faAdd } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { Box, Fab, HStack, Pressable, Spacer, Text, VStack, useToast } from 'native-base';
+import { Box, Fab, HStack, Pressable, Spacer, Spinner, Text, VStack, useToast } from 'native-base';
 import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, SafeAreaView } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -10,7 +10,7 @@ import * as ES from '../services/employee.service';
 
 
 const EmployeesScreen = ({ navigation }: any) => {
-    const user = useSelector((state: { user: User }) => state.user)
+    const token = useSelector((state: { user: User }) => state.user.token)
     const [items, setItems] = useState<Employee[]>([])
     const currentPage = useRef(1)
     const lastPage = useRef(2)
@@ -33,27 +33,24 @@ const EmployeesScreen = ({ navigation }: any) => {
         return null
     }
     function loadData(page = 1) {
-        if (!user || !user.token) {
+        if (!token) {
+            console.log("Token Missing In loadData")
             return null
         }
         if (loading) {
             return null
         }
-        if (page >= lastPage.current) {
+        if (page > lastPage.current) {
             console.log("End Of list")
             return null
         }
-        console.log("Loading Employee List")
-        const token = user.token
-
         setLoading(true)
         ES.list(token, page).then((response) => {
-            if (currentPage.current === 1) {
+            if (response.current_page === 1) {
                 setItems(response.data)
             } else {
                 setItems([...items, ...response.data])
             }
-            setItems([...items, ...response.data])
             currentPage.current = response.current_page
             lastPage.current = response.last_page
             // console.log(JSON.stringify(response, null, 2))
@@ -61,13 +58,19 @@ const EmployeesScreen = ({ navigation }: any) => {
             showError(error.message)
         }).finally(() => setLoading(false))
     }
+    function onRefresh() {
+        lastPage.current = 2
+        loadData(1)
+    }
     useEffect(() => {
         loadData(1)
     }, [])
     return (
         <SafeAreaView style={{ height: "100%" }}>
             <FlatList
-                onEndReached={() => console.log("End Reached")}
+                refreshing={loading}
+                onRefresh={onRefresh}
+                onEndReached={() => loadData(currentPage.current + 1)}
                 data={items}
                 renderItem={({ item }) => <Pressable onPress={() => navigation.navigate("EmployeeSingle")} _pressed={{
                     bg: "muted.100"
@@ -99,7 +102,14 @@ const EmployeesScreen = ({ navigation }: any) => {
                 </Pressable>}
                 keyExtractor={(item, index) => index.toString()}
             />
-            <Fab renderInPortal={false} shadow={2} onPress={() => navigation.navigate("EmployeeCreate")} colorScheme="indigo" icon={<FontAwesomeIcon color='white' icon={faAdd} />} />
+            {loading ? <Spinner color="white" accessibilityLabel="Verifing Credntials" /> : null}
+            <Fab
+                renderInPortal={false}
+                shadow={2} onPress={() => {
+                    navigation.navigate("EmployeeCreate")
+                }}
+                colorScheme="indigo"
+                icon={<FontAwesomeIcon color='white' icon={faAdd} />} />
         </SafeAreaView>
     );
 };
